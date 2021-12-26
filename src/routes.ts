@@ -16,7 +16,7 @@ interface IRoute {
     needValid?: boolean;
 }
 
-const _Routes: IRoute[] = [
+const BlogRoute: IRoute[] = [
     {
         method: "get",
         route: "/blog",
@@ -51,37 +51,15 @@ const _Routes: IRoute[] = [
         needValid: true
     },
     {
-        method: "post",
-        route: "/tag",
-        controller: TagController,
-        action: "add",
-        needValid: true
-    },
-    {
-        method: "get",
-        route: "/tag",
-        controller: TagController,
-        action: "all"
-    },
-    {
-        method: "get",
-        route: "/tag/:id",
-        controller: TagController,
-        action: "find"
-    },
-    {
-        method: "delete",
-        route: "/tag/:id",
-        controller: TagController,
-        action: "remove"
-    },
-    {
         method: "delete",
         route: "/blog/:id",
         controller: BlogController,
         action: "remove",
         needValid: true
-    },
+    }
+];
+
+const AdminRoute: IRoute[] = [
     {
         method: "post",
         route: "/admin",
@@ -100,7 +78,10 @@ const _Routes: IRoute[] = [
         route: "/admin",
         controller: AdminController,
         action: "whoim",
-    },
+    }
+];
+
+const ExtRoute: IRoute[] = [
     {
         method: "get",
         route: "/project/event",
@@ -148,9 +129,46 @@ const CategoryRoute: IRoute[] = [
     }
 ];
 
+const TagRoute: IRoute[] = [
+    {
+        method: "post",
+        route: "/tag",
+        controller: TagController,
+        action: "add",
+        needValid: true
+    },
+    {
+        method: "get",
+        route: "/tag",
+        controller: TagController,
+        action: "all"
+    },
+    {
+        method: "get",
+        route: "/tag/:id",
+        controller: TagController,
+        action: "find"
+    },
+    {
+        method: "delete",
+        route: "/tag/:id",
+        controller: TagController,
+        action: "remove"
+    },
+    {
+        method: "put",
+        route: "/tag/:id",
+        controller: TagController,
+        action: "unLink"
+    }
+];
+
 export const Routes = [
-    ..._Routes,
-    ...CategoryRoute
+    ...BlogRoute,
+    ...CategoryRoute,
+    ...TagRoute,
+    ...AdminRoute,
+    ...ExtRoute
 ];
 
 Routes.map(route => {

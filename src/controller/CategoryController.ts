@@ -20,7 +20,7 @@ export default class CategoryController {
     }
 
     const categoryIns = await this.useCategory.save(categoryObj);
-
+    categoryIns.blogs = [];
     return sendData(categoryIns);
   }
 

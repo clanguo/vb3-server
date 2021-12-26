@@ -56,6 +56,13 @@ export class BlogController {
     if (errors.length > 0) {
       return sendError(errors.join("; "));
     } else {
+      const tags: Tag[] = [];
+      for (const tagId of blog.tags) {
+        const tag = await this.useTag.findOne(tagId);
+        tags.push(tag);
+      }
+      blog.tags = tags;
+
       const contentIns = await this.useContent.save(contentObj);
       blog.content = contentIns;
       const blogIns = await this.useBlog.save(blog);

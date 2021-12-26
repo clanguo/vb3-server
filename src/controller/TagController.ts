@@ -58,4 +58,15 @@ export class TagController {
     }
 
   }
+
+  // 解除tag和blog之间的关联
+  public async unLink(req: Request, res: Response, next: NextFunction): Promise<ResponseResult<boolean>> {
+    const tagId = req.params.id;
+    const blogId = req.body.id;
+
+    const tag = await this.useTag.findOne(tagId, { relations: ["blogs"] });
+    tag.blogs = tag.blogs.filter(blog => blog.id !== blogId);
+    await this.useTag.save(tag);
+    return sendData(true);
+  }
 }

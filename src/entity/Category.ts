@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, MaxLength } from "class-validator";
 import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 import Base from "./Base";
 import { Blog } from "./Blog";
@@ -11,6 +11,7 @@ export default class Category extends Base {
 
   @Column({ unique: true })
   @IsNotEmpty({ message: "分类名不能为空" })
+  @MaxLength(10, { message: "分类名不能超过10个字" })
   @Type(() => String)
   name: string;
 

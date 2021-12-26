@@ -75,7 +75,8 @@ createConnection().then(async connection => {
 
     // register express routes from defined application routes
     Routes.forEach(route => {
-        (app as any)[route.method](route.route, hanlderRoute(route));
+        console.log(route);
+        return (app as any)[route.method](route.route, hanlderRoute(route));
     });
 
     // 注册上传路由
