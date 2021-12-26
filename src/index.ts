@@ -9,6 +9,7 @@ import { match } from "path-to-regexp";
 import { Auth } from "./controller/Auth";
 import * as cookieParser from "cookie-parser";
 import * as path from "path";
+import * as history from "connect-history-api-fallback";
 
 const PORT = 3001;
 
@@ -59,6 +60,9 @@ createConnection().then(async connection => {
 
     // cookie解析
     app.use(cookieParser());
+
+    // 路由资源
+    app.use(history());
 
     // 静态资源
     app.use(express.static(path.resolve(__dirname, "../public")));

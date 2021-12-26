@@ -13,9 +13,11 @@
       "typescript": "3.3.3333"
    },
    "dependencies": {
+      "@types/connect-history-api-fallback": "^1.3.5",
       "body-parser": "^1.18.1",
       "class-transformer": "^0.5.1",
       "class-validator": "^0.13.2",
+      "connect-history-api-fallback": "^1.6.0",
       "cookie-parser": "^1.4.6",
       "express": "^4.15.4",
       "jsonwebtoken": "^8.5.1",
