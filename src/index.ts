@@ -58,6 +58,12 @@ createConnection().then(async connection => {
     const app = express();
     app.use(bodyParser.json());
 
+    // log
+    app.use((req: Request, res: Response, next: NextFunction) => {
+        console.log(req.path);
+        next();
+    });
+
     // cookie解析
     app.use(cookieParser());
 
@@ -66,6 +72,7 @@ createConnection().then(async connection => {
 
     // 静态资源
     app.use(express.static(path.resolve(__dirname, "../public")));
+    app.use("/", express.static(path.resolve(__dirname, "../public/dist")));
 
     // 注册鉴权路由
     app.use("/api", (req: Request, res: Response, next: NextFunction) => {
@@ -79,7 +86,6 @@ createConnection().then(async connection => {
 
     // register express routes from defined application routes
     Routes.forEach(route => {
-        console.log(route);
         return (app as any)[route.method](route.route, hanlderRoute(route));
     });
 
