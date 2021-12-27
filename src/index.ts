@@ -9,7 +9,7 @@ import { match } from "path-to-regexp";
 import { Auth } from "./controller/Auth";
 import * as cookieParser from "cookie-parser";
 import * as path from "path";
-import * as history from "connect-history-api-fallback";
+// import * as history from "connect-history-api-fallback";
 
 const PORT = 3001;
 
@@ -67,11 +67,11 @@ createConnection().then(async connection => {
     app.use(cookieParser());
 
     // 路由资源
-    app.use(history());
+    // app.use(history());
 
     // 静态资源
     app.use(express.static(path.resolve(__dirname, "../public")));
-    app.use("/", express.static(path.resolve(__dirname, "../public/dist")));
+    // app.use("/", express.static(path.resolve(__dirname, "../public/dist")));
 
     // 注册鉴权路由
     app.use("/api", (req: Request, res: Response, next: NextFunction) => {
