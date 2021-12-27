@@ -53,16 +53,15 @@ const hanlderUploadRoute = (route) => {
 }
 
 createConnection().then(async connection => {
-
     // create express app
     const app = express();
     app.use(bodyParser.json());
 
     // log
-    app.use((req: Request, res: Response, next: NextFunction) => {
-        console.log(req.path);
-        next();
-    });
+    // app.use((req: Request, res: Response, next: NextFunction) => {
+    //     console.log(req.path);
+    //     next();
+    // });
 
     // cookie解析
     app.use(cookieParser());

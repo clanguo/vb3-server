@@ -18,6 +18,7 @@ const Common_1 = require("./controller/Common");
 const path_to_regexp_1 = require("path-to-regexp");
 const Auth_1 = require("./controller/Auth");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 const history = require("connect-history-api-fallback");
 const PORT = 3001;
 const hanlderRoute = (route) => {
@@ -64,12 +65,18 @@ const hanlderUploadRoute = (route) => {
     // create express app
     const app = express();
     app.use(bodyParser.json());
+    // log
+    app.use((req, res, next) => {
+        console.log(req.path);
+        next();
+    });
     // cookie解析
     app.use(cookieParser());
     // 路由资源
     app.use(history());
     // 静态资源
-    // app.use(express.static(path.resolve(__dirname, "../public")));
+    app.use(express.static(path.resolve(__dirname, "../public")));
+    app.use("/", express.static(path.resolve(__dirname, "../public/dist")));
     // 注册鉴权路由
     app.use("/api", (req, res, next) => {
         const matchRoute = routes_1.Routes.find(route => route.method.toUpperCase() === req.method && !!(0, path_to_regexp_1.match)(route.route, { start: true, end: true })(req.path));
@@ -82,7 +89,6 @@ const hanlderUploadRoute = (route) => {
     });
     // register express routes from defined application routes
     routes_1.Routes.forEach(route => {
-        console.log(route);
         return app[route.method](route.route, hanlderRoute(route));
     });
     // 注册上传路由
