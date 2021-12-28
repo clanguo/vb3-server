@@ -10,6 +10,7 @@ import { Auth } from "./controller/Auth";
 import * as cookieParser from "cookie-parser";
 import * as path from "path";
 // import * as history from "connect-history-api-fallback";
+import * as cors from "cors";
 
 const PORT = 3001;
 
@@ -68,6 +69,10 @@ createConnection().then(async connection => {
 
     // 路由资源
     // app.use(history());
+
+    app.use(cors({
+        origin: (origin, callback) => callback(null, true)
+    }));
 
     // 静态资源
     app.use(express.static(path.resolve(__dirname, "../public")));
