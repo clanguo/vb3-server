@@ -1,4 +1,4 @@
-import { ClassConstructor, plainToClass, plainToInstance, Type } from "class-transformer";
+import { ClassConstructor, plainToInstance, Type } from "class-transformer";
 import { validate } from "class-validator";
 import { CreateDateColumn, UpdateDateColumn } from "typeorm";
 
