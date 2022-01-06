@@ -11,6 +11,10 @@ import * as cookieParser from "cookie-parser";
 import * as path from "path";
 // import * as history from "connect-history-api-fallback";
 import * as cors from "cors";
+import ConfigManager from "./config/configManager";
+
+// 初始创建configManager对象
+ConfigManager.getConfigManager();
 
 const PORT = 3001;
 

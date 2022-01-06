@@ -5,12 +5,13 @@ import Category from "../entity/Category";
 import EventLog, { EventType, IEventLog } from "../entity/EventLog";
 import { Tag } from "../entity/Tag";
 import { ResponsePageData, ResponseResult, sendData, sendError, sendPageData } from "./Common";
-
+import ConfigManager from "../config/configManager";
 class ProjectController {
   private useEventLog = getRepository(EventLog);
   private useBlogs = getRepository(Blog);
   private useTags = getRepository(Tag);
   private useCategory = getRepository(Category);
+  private configManager = ConfigManager.getConfigManager();
 
   public async addEventLog(obj: IEventLog): Promise<void> {
     const eventLog = EventLog.transform(obj);
@@ -42,10 +43,19 @@ class ProjectController {
     const blogs = await this.useBlogs.count();
     const tags = await this.useTags.count();
     const categories = await this.useCategory.count();
-    return sendData({ blog: blogs, tag: tags, categories });
+    const config = this.configManager.getConfig() as any;
+    return sendData({
+      blog: blogs,
+      tag: tags,
+      categories,
+      github: config.github,
+      countWords: config.countWords,
+      startTime: config.startTime,
+      lastUpdatedTime: config.lastUpdatedTime
+    });
   }
 
-  public async archive(req: Request, res: Response, next: NextFunction): Promise<ResponseResult<any>>{
+  public async archive(req: Request, res: Response, next: NextFunction): Promise<ResponseResult<any>> {
     const blogs = await this.useEventLog.find({ type: EventType.addBlog });
     return sendData(blogs);
   }
