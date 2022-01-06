@@ -22,6 +22,10 @@ class ProjectController {
     } else {
       await this.useEventLog.save(eventLog);
     }
+
+    ConfigManager.setConfig({
+      lastUpdatedTime: Date.now()
+    });
   }
 
   public async one(req: Request, res: Response, next: NextFunction): Promise<ResponseResult<EventLog>> {

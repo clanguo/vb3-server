@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { getRepository } from "typeorm";
+import ConfigManager from "../config/configManager";
 import { EventType } from "../entity/EventLog";
 import { Tag } from "../entity/Tag";
 import { ResponseResult, sendData, sendError } from "./Common";
@@ -63,6 +64,10 @@ export class TagController {
   public async unLink(req: Request, res: Response, next: NextFunction): Promise<ResponseResult<boolean>> {
     const tagId = req.params.id;
     const blogId = req.body.id;
+
+    ConfigManager.setConfig({
+      lastUpdatedTime: Date.now()
+    });
 
     const tag = await this.useTag.findOne(tagId, { relations: ["blogs"] });
     tag.blogs = tag.blogs.filter(blog => blog.id !== blogId);

@@ -2,6 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import multer = require("multer");
 import { ResponseResult } from "./Common";
 import * as path from "path";
+import ConfigManager from "../config/configManager";
 
 const storage = multer.diskStorage({
   destination(req, file, cb) {
@@ -34,6 +35,9 @@ const uploadStorage = multer({
 
 export class UploadsController {
   async poster(req: Request, res: Response, next: NextFunction) {
+    ConfigManager.setConfig({
+      lastUpdatedTime: Date.now()
+    });
     return uploadStorage.single("poster")(req, res, next);
   }
 }

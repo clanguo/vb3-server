@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { createConnection } from "typeorm";
 import * as express from "express";
 import * as bodyParser from "body-parser";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, Errback } from "express";
 import { Routes, uploadsRoutes } from "./routes";
 import { sendError, sendData } from "./controller/Common";
 import { match } from "path-to-regexp";
@@ -14,9 +14,13 @@ import * as cors from "cors";
 import ConfigManager from "./config/configManager";
 
 // 初始创建configManager对象
-ConfigManager.getConfigManager();
+const configManager = ConfigManager.getConfigManager();
 
 const PORT = 3001;
+
+class CORSError extends Error {
+
+}
 
 const hanlderRoute = (route) => {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -75,7 +79,22 @@ createConnection().then(async connection => {
     // app.use(history());
 
     app.use(cors({
-        origin: (origin, callback) => callback(null, true)
+        origin: (origin, callback) => {
+            const allowOrigin = configManager.getConfig("allowOrigin");
+            if (typeof allowOrigin === "boolean") {
+                if (allowOrigin) {
+                    callback(null, true);
+                }
+            } else {
+                if ((allowOrigin as string[]).includes(origin)
+                    || origin === undefined
+                ) {
+                    callback(null, true);
+                } else {
+                    callback(new CORSError(`域名:${origin}不在cors白名单内`));
+                }
+            }
+        }
     }));
 
     // 静态资源
@@ -104,6 +123,14 @@ createConnection().then(async connection => {
 
     // setup express app here
     // ...
+
+    app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+        if (err instanceof CORSError) {
+            res.status(200).send(err.message);
+        } else {
+            res.sendStatus(500);
+        }
+    });
 
     // start express server
     app.listen(PORT);

@@ -8,6 +8,7 @@ import EventLog, { EventType } from "../entity/EventLog";
 import ProjectController from "./ProjectController";
 import SearchCondition from "../entity/SearchCondition";
 import { instanceToPlain } from "class-transformer";
+import ConfigManager from "../config/configManager";
 
 export class BlogController {
   private useBlog = getRepository(Blog);
@@ -98,6 +99,10 @@ export class BlogController {
   }
 
   async editInfo(request: Request, response: Response, next: NextFunction): Promise<ResponseResult<boolean>> {
+    ConfigManager.setConfig({
+      lastUpdatedTime: Date.now()
+    });
+    
     try {
       const id = request.params.id;
       const blog = await this.useBlog.findOne(id);
@@ -135,6 +140,10 @@ export class BlogController {
   }
 
   async editContent(request: Request, response: Response, next: NextFunction): Promise<ResponseResult<boolean>> {
+    // ConfigManager.setConfig({
+    //   lastUpdatedTime: Date.now()
+    // });
+
     const editContent = new BlogContent(request.body.content);
     const errors = await editContent.validateThis();
     if (errors.length) {
