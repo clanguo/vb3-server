@@ -104,13 +104,15 @@ const ProjectRoute: IRoute[] = [
         method: "get",
         route: "/project/setting",
         controller: ProjectController,
-        action: "getSetting"
+        action: "getSetting",
+        needValid: true
     },
     {
         method: "post",
         route: "/project/setting",
         controller: ProjectController,
-        action: "setSetting"
+        action: "setSetting",
+        needValid: true
     }
 ];
 
