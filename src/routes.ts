@@ -81,7 +81,7 @@ const AdminRoute: IRoute[] = [
     }
 ];
 
-const ExtRoute: IRoute[] = [
+const ProjectRoute: IRoute[] = [
     {
         method: "get",
         route: "/project/event",
@@ -99,6 +99,18 @@ const ExtRoute: IRoute[] = [
         route: "/archive",
         controller: ProjectController,
         action: "archive"
+    },
+    {
+        method: "get",
+        route: "/project/setting",
+        controller: ProjectController,
+        action: "getSetting"
+    },
+    {
+        method: "post",
+        route: "/project/setting",
+        controller: ProjectController,
+        action: "setSetting"
     }
 ];
 
@@ -168,7 +180,7 @@ export const Routes = [
     ...CategoryRoute,
     ...TagRoute,
     ...AdminRoute,
-    ...ExtRoute
+    ...ProjectRoute
 ];
 
 Routes.map(route => {

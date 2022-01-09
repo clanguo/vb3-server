@@ -1,4 +1,4 @@
-import { ClassConstructor, plainToInstance, Type } from "class-transformer";
+import { ClassConstructor, ClassTransformOptions, plainToInstance, Type } from "class-transformer";
 import { validate } from "class-validator";
 import { CreateDateColumn, UpdateDateColumn } from "typeorm";
 
@@ -11,11 +11,11 @@ export default class Base {
   @Type(() => Date)
   updatedAt: Date;
 
-  protected static baseTransform<T>(cls: ClassConstructor<T>, planObject: object): T {
+  protected static baseTransform<T>(cls: ClassConstructor<T>, planObject: object, options?: ClassTransformOptions): T {
     if (planObject instanceof cls) {
       return planObject;
     } else {
-      return plainToInstance(cls, planObject);
+      return plainToInstance(cls, planObject, options);
     }
   }
 

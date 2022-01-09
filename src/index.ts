@@ -86,7 +86,8 @@ createConnection().then(async connection => {
                     callback(null, true);
                 }
             } else {
-                if ((allowOrigin as string[]).includes(origin)
+                if (
+                    allowOrigin && (allowOrigin as string[]).includes(origin)
                     || origin === undefined
                 ) {
                     callback(null, true);
@@ -126,9 +127,10 @@ createConnection().then(async connection => {
 
     app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
         if (err instanceof CORSError) {
-            res.status(200).send(err.message);
+            res.status(200).send(sendError(err.message));
         } else {
             res.sendStatus(500);
+            console.log(err.message)
         }
     });
 

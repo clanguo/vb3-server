@@ -6,6 +6,7 @@ import EventLog, { EventType, IEventLog } from "../entity/EventLog";
 import { Tag } from "../entity/Tag";
 import { ResponsePageData, ResponseResult, sendData, sendError, sendPageData } from "./Common";
 import ConfigManager from "../config/configManager";
+import Config from "../config/Config";
 class ProjectController {
   private useEventLog = getRepository(EventLog);
   private useBlogs = getRepository(Blog);
@@ -52,7 +53,7 @@ class ProjectController {
       blog: blogs,
       tag: tags,
       categories,
-      github: config.github,
+      projectAddress: config.projectAddress,
       countWords: config.countWords,
       startTime: config.startTime,
       lastUpdatedTime: config.lastUpdatedTime
@@ -62,6 +63,22 @@ class ProjectController {
   public async archive(req: Request, res: Response, next: NextFunction): Promise<ResponseResult<any>> {
     const blogs = await this.useEventLog.find({ type: EventType.addBlog });
     return sendData(blogs);
+  }
+
+  public async getSetting(req: Request, res: Response, next: NextFunction): Promise<ResponseResult<object>> {
+    const config = this.configManager.getConfig();
+    return sendData(config);
+  }
+  
+  public async setSetting(req: Request, res: Response, next: NextFunction): Promise<ResponseResult<boolean>> {
+    const config = Config.transform(req.body, { excludeExtraneousValues: true });
+    const errors = await config.validateThis(true);
+    if (errors.length) {
+      return sendError(errors.join("; "));
+    }
+
+    this.configManager.setConfig(Config.toPlainObject(config));
+    return sendData(true);
   }
 }
 
