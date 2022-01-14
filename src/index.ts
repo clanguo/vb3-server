@@ -15,6 +15,9 @@ import corsMiddleware from "./middleware/corsMiddleware";
 import { routeLogger } from "./logger";
 import * as log4js from "log4js";
 import errorMiddleware from "./middleware/errorMiddleware";
+import * as fs from "fs";
+import { putReadableStream } from "./tools/qiniuTool";
+
 // 初始创建configManager对象
 const configManager = ConfigManager.getConfigManager();
 
@@ -54,7 +57,17 @@ const hanlderUploadRoute = (route) => {
                 if (req.files) {
                     res.send(sendData(req.files));
                 } else {
-                    res.send(sendData("/uploads/" + req.file!.filename));
+                    const readStream = fs.createReadStream(req.file.path);
+                    putReadableStream("img/" + req.file.filename, readStream).then(data => {
+                        res.send(sendData(data));
+                    }, err => {
+                        if (err instanceof Error) {
+                            res.send(sendError(err.message));
+                        } else {
+                            res.send(sendError("上传失败"));
+                        }
+                    });
+                    // res.send(sendData("/uploads/" + req.file!.filename));
                 }
             }
         });
