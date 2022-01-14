@@ -77,6 +77,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/log4js@^2.3.5":
+  version "2.3.5"
+  resolved "https://registry.nlark.com/@types/log4js/download/@types/log4js-2.3.5.tgz#4d1e56da53d3c1820c08e9cd5092e68c3e1e822f"
+  integrity sha1-TR5W2lPTwYIMCOnNUJLmjD4egi8=
+  dependencies:
+    log4js "*"
+
 "@types/mime@^1":
   version "1.3.2"
   resolved "https://registry.npmmirror.com/@types/mime/download/@types/mime-1.3.2.tgz"
@@ -769,7 +776,7 @@ lodash.once@^4.0.0:
   resolved "https://registry.nlark.com/lodash.once/download/lodash.once-4.1.1.tgz"
   integrity sha1-DdOXEhPHxW34gJd9UEyI+0cal6w=
 
-log4js@^6.3.0:
+log4js@*, log4js@^6.3.0:
   version "6.3.0"
   resolved "https://registry.npm.taobao.org/log4js/download/log4js-6.3.0.tgz#10dfafbb434351a3e30277a00b9879446f715bcb"
   integrity sha1-EN+vu0NDUaPjAnegC5h5RG9xW8s=
