@@ -10,17 +10,17 @@ import { Auth } from "./controller/Auth";
 import * as cookieParser from "cookie-parser";
 import * as path from "path";
 // import * as history from "connect-history-api-fallback";
-import * as cors from "cors";
 import ConfigManager from "./config/configManager";
-
+import corsMiddleware from "./middleware/corsMiddleware";
+import { routeLogger } from "./logger";
+import * as log4js from "log4js";
+import errorMiddleware from "./middleware/errorMiddleware";
 // 初始创建configManager对象
 const configManager = ConfigManager.getConfigManager();
 
 const PORT = 3001;
 
-class CORSError extends Error {
 
-}
 
 const hanlderRoute = (route) => {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -66,37 +66,17 @@ createConnection().then(async connection => {
     const app = express();
     app.use(bodyParser.json());
 
-    // log
-    // app.use((req: Request, res: Response, next: NextFunction) => {
-    //     console.log(req.path);
-    //     next();
-    // });
-
     // cookie解析
     app.use(cookieParser());
 
     // 路由资源
     // app.use(history());
 
-    app.use(cors({
-        origin: (origin, callback) => {
-            const allowOrigin = configManager.getConfig("allowOrigin");
-            if (typeof allowOrigin === "boolean") {
-                if (allowOrigin) {
-                    callback(null, true);
-                }
-            } else {
-                if (
-                    allowOrigin && (allowOrigin as string[]).includes(origin)
-                    || origin === undefined
-                ) {
-                    callback(null, true);
-                } else {
-                    callback(new CORSError(`域名:${origin}不在cors白名单内`));
-                }
-            }
-        }
-    }));
+    // cors中间件
+    app.use(corsMiddleware);
+
+    // logger
+    app.use(log4js.connectLogger(routeLogger, {}));
 
     // 静态资源
     app.use(express.static(path.resolve(__dirname, "../public")));
@@ -125,14 +105,7 @@ createConnection().then(async connection => {
     // setup express app here
     // ...
 
-    app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-        if (err instanceof CORSError) {
-            res.status(200).send(sendError(err.message));
-        } else {
-            res.sendStatus(500);
-            console.log(err.message)
-        }
-    });
+    app.use(errorMiddleware);
 
     // start express server
     app.listen(PORT);
