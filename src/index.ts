@@ -12,6 +12,8 @@ import * as path from "path";
 // import * as history from "connect-history-api-fallback";
 import * as cors from "cors";
 import ConfigManager from "./config/configManager";
+import * as fs from "fs";
+import { putReadableStream } from "./tools/qiniuTool";
 
 // 初始创建configManager对象
 const configManager = ConfigManager.getConfigManager();
@@ -54,7 +56,18 @@ const hanlderUploadRoute = (route) => {
                 if (req.files) {
                     res.send(sendData(req.files));
                 } else {
-                    res.send(sendData("/uploads/" + req.file!.filename));
+                    const readStream = fs.createReadStream(req.file.path);
+                    putReadableStream("img/" + req.file.filename, readStream).then(data => {
+                        console.log(data);
+                        res.send(sendData(data));
+                    }, err => {
+                        if (err instanceof Error) {
+                            res.send(sendError(err.message));
+                        } else {
+                            res.send(sendError("上传失败"));
+                        }
+                    });
+                    // res.send(sendData("/uploads/" + req.file!.filename));
                 }
             }
         });
