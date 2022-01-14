@@ -58,7 +58,6 @@ const hanlderUploadRoute = (route) => {
                 } else {
                     const readStream = fs.createReadStream(req.file.path);
                     putReadableStream("img/" + req.file.filename, readStream).then(data => {
-                        console.log(data);
                         res.send(sendData(data));
                     }, err => {
                         if (err instanceof Error) {
