@@ -4,7 +4,7 @@ import Config from "./Config";
 
 export default class ConfigManager {
   private siteConfig: Config;
-  private static configPath = path.resolve(__dirname, "./siteinfo.json");
+  private static configPath = path.resolve(__dirname, "../../siteinfo.json");
   private writePromise: Promise<void> = Promise.resolve();
 
   private constructor() {
