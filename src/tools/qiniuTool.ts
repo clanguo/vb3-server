@@ -17,11 +17,13 @@ const options = {
 const bucketManager = new qiniu.rs.BucketManager(mac, {});
 const publicBucketDomain = "http://static.clanguo.top";
 
+
+// 上传凭证
+const putPolicy = new qiniu.rs.PutPolicy(options);
+const uploadToken = putPolicy.uploadToken(mac);
+
 export function putReadableStream(key: string, readableStream: ReadStream, config: qiniu.conf.Config = {}): Promise<string | void> {
   return new Promise((resolve, reject) => {
-    // 上传凭证
-    const putPolicy = new qiniu.rs.PutPolicy(options);
-    const uploadToken = putPolicy.uploadToken(mac);
     // 创建数据流上传
     const formUploader = new qiniu.form_up.FormUploader(config);
     const putExtra = new qiniu.form_up.PutExtra();
@@ -39,5 +41,24 @@ export function putReadableStream(key: string, readableStream: ReadStream, confi
         return reject({ body, info });
       }
     });
+  });
+}
+
+export function putBuffer(key: string, data: Buffer | string, config: qiniu.conf.Config = {}): Promise<string | undefined> {
+  return new Promise((resolve, reject) => {
+    const formUploader = new qiniu.form_up.FormUploader(config);
+    const putExtra = new qiniu.form_up.PutExtra();
+    formUploader.put(uploadToken, key, data, putExtra, function(err, body, info) {
+      if (err) {
+        return reject(err);
+      }
+
+      if (info.statusCode === 200) {
+        const publicDownloadUrl = bucketManager.publicDownloadUrl(publicBucketDomain, key);
+        return resolve(publicDownloadUrl);
+      } else {
+        return reject({ body, info })
+      }
+    })
   });
 }

@@ -3,17 +3,22 @@ import { AdminController } from "./controller/AdminController";
 import { BlogController } from "./controller/BlogController";
 import ProjectController from "./controller/ProjectController";
 import { TagController } from "./controller/TagController";
-import { UploadsController } from "./controller/UploadsController";
+import { uploadMemoryStorage, UploadsController } from "./controller/UploadsController";
 import * as multer from 'multer';
 import * as path from "path";
 import CategoryController from "./controller/CategoryController";
 
-interface IRoute {
+export interface IRoute {
     method: "get" | "post" | "put" | "delete";
     route: string;
     controller: ClassConstructor<any>;
     action: string;
     needValid?: boolean;
+}
+
+export interface IUploadRoute extends IRoute {
+    fileds: any,
+    method: "post"
 }
 
 const BlogRoute: IRoute[] = [
@@ -190,43 +195,14 @@ Routes.map(route => {
     return route;
 });
 
-const storage = multer.diskStorage({
-    destination(req, file, cb) {
-        cb(null, path.resolve(__dirname, "../public/uploads"));
-    },
-    filename(req, file, cb) {
-        const uniqueSuffix = Date.now().toString().substr(5) + '_' + Math.round(Math.random() * 1E9);
-        const extname = path.extname(file.originalname);
-        cb(null, uniqueSuffix + extname);
-    }
-});
 
-
-const whiteExtendName = [".png", '.jpg', '.jpeg', '.gif'];
-
-const uploadStorage = multer({
-    storage,
-    limits: {
-        fileSize: 10485760
-        // fileSize: 1
-    },
-    fileFilter(req, file, cb) {
-        const extname = path.extname(file.originalname);
-        if (whiteExtendName.includes(extname)) {
-            cb(null, true);
-        } else {
-            cb(new Error(`不接受扩展名为${extname}的文件`));
-        }
-    }
-});
-// const upload = uploadStorage.single("poster");
-
-export const uploadsRoutes = [
+export const uploadsRoutes: IUploadRoute[] = [
     {
         method: "post",
         route: "/api/uploads",
         controller: UploadsController,
         action: "poster",
-        fileds: uploadStorage.single("poster"),
+        // fileds: uploadStorage.single("poster"),
+        fileds: uploadMemoryStorage.single("poster"),
     }
 ];

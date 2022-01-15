@@ -3,7 +3,7 @@ import { createConnection } from "typeorm";
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import { Request, Response, NextFunction, Errback } from "express";
-import { Routes, uploadsRoutes } from "./routes";
+import { IRoute, IUploadRoute, Routes, uploadsRoutes } from "./routes";
 import { sendError, sendData } from "./controller/Common";
 import { match } from "path-to-regexp";
 import { Auth } from "./controller/Auth";
@@ -16,7 +16,8 @@ import { routeLogger } from "./logger";
 import * as log4js from "log4js";
 import errorMiddleware from "./middleware/errorMiddleware";
 import * as fs from "fs";
-import { putReadableStream } from "./tools/qiniuTool";
+import { putBuffer, putReadableStream } from "./tools/qiniuTool";
+import uploadMiddleware from "./middleware/uploadMiddleware";
 
 // 初始创建configManager对象
 const configManager = ConfigManager.getConfigManager();
@@ -25,7 +26,7 @@ const PORT = 3001;
 
 
 
-const hanlderRoute = (route) => {
+const hanlderRoute = (route: IRoute) => {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
             const result = (new (route.controller as any))[route.action](req, res, next);
@@ -46,31 +47,9 @@ const hanlderRoute = (route) => {
 
 }
 
-const hanlderUploadRoute = (route) => {
-    return (req: Request, res: Response) => {
-        route.fileds(req, res, err => {
-            if (err instanceof Error) {
-                res.send(sendError(err.message));
-            } else if (err) {
-                res.send(sendError(err));
-            } else {
-                if (req.files) {
-                    res.send(sendData(req.files));
-                } else {
-                    const readStream = fs.createReadStream(req.file.path);
-                    putReadableStream("img/" + req.file.filename, readStream).then(data => {
-                        res.send(sendData(data));
-                    }, err => {
-                        if (err instanceof Error) {
-                            res.send(sendError(err.message));
-                        } else {
-                            res.send(sendError("上传失败"));
-                        }
-                    });
-                    // res.send(sendData("/uploads/" + req.file!.filename));
-                }
-            }
-        });
+const hanlderUploadRoute = (route: IUploadRoute) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
+        (new route.controller)[route.action](req, res, next);
     }
 }
 
@@ -112,7 +91,7 @@ createConnection().then(async connection => {
 
     // 注册上传路由
     uploadsRoutes.forEach(route => {
-        app.post(route.route, hanlderUploadRoute(route));
+        app.post(route.route, hanlderUploadRoute(route), uploadMiddleware);
     });
 
     // setup express app here
