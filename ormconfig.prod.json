@@ -5,7 +5,7 @@
   "username": "admin",
   "password": "itebmiE24Ny3GAkA",
   "database": "server",
-  "synchronize": false,
+  "synchronize": true,
   "logging": false,
   "entities": [
      "build/entity/**/*.js"
