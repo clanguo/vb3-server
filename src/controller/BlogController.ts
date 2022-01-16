@@ -9,6 +9,7 @@ import ProjectController from "./ProjectController";
 import SearchCondition from "../entity/SearchCondition";
 import { instanceToPlain } from "class-transformer";
 import ConfigManager from "../config/configManager";
+import { Exception } from "../middleware/errorMiddleware";
 
 export class BlogController {
   private useBlog = getRepository(Blog);
@@ -17,10 +18,10 @@ export class BlogController {
 
   async all(request: Request, response: Response, next: NextFunction): Promise<ResponsePageData<Blog[]>> {
     const searchCondition: SearchCondition = SearchCondition.transform(request.query);
+
     const errors = await searchCondition.validateThis();
     if (errors.length) {
-      // return sendError(errors.join("; "));
-      return sendPageError(errors.join("; "));
+      return sendPageError("请检查请求参数是否正确");
     }
 
     const blogs = await this.useBlog.find({
@@ -43,14 +44,16 @@ export class BlogController {
     if (blog) {
       return sendData(blog);
     } else {
-      return sendError("No Data with `id` :" + request.params.id + " was found");
+      return sendError("没有找到id为:" + request.params.id + "的数据");
     }
   }
 
   async save(request: Request, response: Response, next: NextFunction): Promise<ResponseResult<Blog>> {
     const contentObj = new BlogContent(request.body.content);
     const blog = Blog.transform(request.body);
+    
     blog.content = contentObj;
+
     const contentErrors = await contentObj.validateThis();
     const blogErrors = await blog.validateThis(true);
     const errors = blogErrors.concat(contentErrors);
@@ -76,12 +79,8 @@ export class BlogController {
     }
   }
 
-  /**
-   * TODO 鉴权
-   */
   async remove(request: Request, response: Response, next: NextFunction) {
     let blogIns = await this.useBlog.findOne(request.params.id, { relations: ["content"] });
-    // await this.useContent.remove(userToRemove.)
     if (blogIns) {
       // 不需要等待记录添加就可以直接响应
       new ProjectController().addEventLog({
@@ -140,10 +139,6 @@ export class BlogController {
   }
 
   async editContent(request: Request, response: Response, next: NextFunction): Promise<ResponseResult<boolean>> {
-    // ConfigManager.setConfig({
-    //   lastUpdatedTime: Date.now()
-    // });
-
     const editContent = new BlogContent(request.body.content);
     const errors = await editContent.validateThis();
     if (errors.length) {

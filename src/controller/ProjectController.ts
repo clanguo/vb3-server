@@ -35,7 +35,7 @@ class ProjectController {
     if (eventLogIns) {
       return sendData(eventLogIns);
     } else {
-      return sendError("No Data with `id` :" + id + " was found");
+      return sendError("找不到id为:" + id + "的数据");
     }
   }
 

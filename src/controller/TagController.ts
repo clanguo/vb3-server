@@ -15,6 +15,10 @@ export class TagController {
      * 添加tag时不添加blog
      */
     delete tag.blogs;
+    /**
+     * 防止已添加的数据被使用
+     */
+    delete tag.id;
     const errors = await tag.validateThis();
     if (errors.length) {
       return sendError(errors.join("; "));

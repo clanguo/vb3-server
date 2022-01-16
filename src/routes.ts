@@ -132,12 +132,14 @@ const CategoryRoute: IRoute[] = [
         method: "post",
         route: "/category",
         controller: CategoryController,
+        needValid: true,
         action: "save"
     },
     {
         method: "delete",
         route: "/category/:id",
         controller: CategoryController,
+        needValid: true,
         action: "remove"
     },
     {
@@ -172,6 +174,7 @@ const TagRoute: IRoute[] = [
         method: "delete",
         route: "/tag/:id",
         controller: TagController,
+        needValid: true,
         action: "remove"
     },
     {
@@ -202,6 +205,7 @@ export const uploadsRoutes: IUploadRoute[] = [
         route: "/api/uploads",
         controller: UploadsController,
         action: "poster",
+        needValid: true,
         // fileds: uploadStorage.single("poster"),
         fileds: uploadMemoryStorage.single("poster"),
     }

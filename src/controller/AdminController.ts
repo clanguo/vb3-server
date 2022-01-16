@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { getRepository } from "typeorm";
 import { Admin } from "../entity/Admin";
+import { Exception } from "../middleware/errorMiddleware";
 import { Auth } from "./Auth";
 import { ResponseResult, sendData, sendError } from "./Common";
 
@@ -14,14 +15,21 @@ export class AdminController {
 
     const errors = await admin.validateThis();
     if (errors.length) {
-      return sendError(errors.join("; "));
+      // return sendError(errors.join("; "));
+      return sendError("账号或密码错误");
     }
 
     // 检查jwt
     const token = Auth.verify(req);
     if (token) {
-      if ((token as Admin).account === admin.account) {
-        Auth.publish(res, { account: admin.account });
+      const { account, remember = 0 } = token;
+      
+      if (account === admin.account) {
+        if (remember === 1) {
+          Auth.publish(res, { account: admin.account }, Auth.saveLongTime);
+        } else {
+          Auth.publish(res, { account: admin.account });
+        }
         return sendError("已登录");
       }
 
@@ -30,8 +38,13 @@ export class AdminController {
 
     const adminIns = await this.useAdmin.findOne(admin.account);
     if (adminIns && adminIns.password === admin.password) {
-      const data = { account: adminIns.account };
-      Auth.publish(res, data);
+      const remember = req.body.remember | 0;
+      const data = { account: adminIns.account, remember };
+      if (remember === 1) {
+        Auth.publish(res, data, Auth.saveLongTime);
+      } else {
+        Auth.publish(res, data);
+      }
       return sendData(data);
     } else {
       return sendError("账号或密码错误");
@@ -49,7 +62,7 @@ export class AdminController {
 
     // token验证失败
     if (!verifyResult) {
-      return sendError("Authentication failed");
+      return sendError("身份验证不通过");
     }
 
     const adminIns = await this.useAdmin.findOne(admin.account);
@@ -58,13 +71,19 @@ export class AdminController {
       return sendData("成功退出登录");
     }
 
-    return sendError("Authentication failed");
+    return sendError("身份验证不通过");
   }
 
   async whoim(req: Request, res: Response, next: NextFunction): Promise<ResponseResult<any>> {
-    const account = Auth.verify(req);
-    if (account) {
-      Auth.publish(res, { account });
+    const result: any = Auth.verify(req);
+
+    if (result) {
+      const { account, remember = 0 } = result;
+      if (remember === 1) {
+        Auth.publish(res, { account }, 3600000 * 24 * 7);
+      } else {
+        Auth.publish(res, { account });
+      }
       return sendData({ account });
     } else {
       Auth.remove(res);
