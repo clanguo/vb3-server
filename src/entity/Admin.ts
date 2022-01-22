@@ -1,6 +1,7 @@
 import { Type } from "class-transformer";
 import { IsNotEmpty, Matches, MaxLength, MinLength } from "class-validator";
 import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { AdminPermission, VisitorPermission } from "../constant/admin";
 import Base from "./Base";
 
 @Entity()
@@ -21,6 +22,10 @@ export class Admin extends Base {
   @Type(() => String)
   @Column()
   password: string;
+
+  @Type(() => Number)
+  @Column()
+  permission: AdminPermission = VisitorPermission;
 
   public static transform(obj: object) {
     return super.baseTransform(this, obj);

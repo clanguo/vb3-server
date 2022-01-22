@@ -7,6 +7,7 @@ import { uploadMemoryStorage, UploadsController } from "./controller/UploadsCont
 import * as multer from 'multer';
 import * as path from "path";
 import CategoryController from "./controller/CategoryController";
+import { AdminPermission, OwnerPermission } from "./constant/admin";
 
 export interface IRoute {
     method: "get" | "post" | "put" | "delete";
@@ -14,6 +15,7 @@ export interface IRoute {
     controller: ClassConstructor<any>;
     action: string;
     needValid?: boolean;
+    permissiion?: AdminPermission;
 }
 
 export interface IUploadRoute extends IRoute {
@@ -33,7 +35,8 @@ const BlogRoute: IRoute[] = [
         route: "/blog",
         controller: BlogController,
         action: "save",
-        needValid: true
+        needValid: true,
+        permissiion: OwnerPermission
     },
     {
         method: "get",
@@ -46,21 +49,24 @@ const BlogRoute: IRoute[] = [
         route: "/blog/info/:id",
         controller: BlogController,
         action: "editInfo",
-        needValid: true
+        needValid: true,
+        permissiion: OwnerPermission
     },
     {
         method: "put",
         route: "/blog/:id",
         controller: BlogController,
         action: "editContent",
-        needValid: true
+        needValid: true,
+        permissiion: OwnerPermission
     },
     {
         method: "delete",
         route: "/blog/:id",
         controller: BlogController,
         action: "remove",
-        needValid: true
+        needValid: true,
+        permissiion: OwnerPermission
     }
 ];
 
@@ -117,7 +123,8 @@ const ProjectRoute: IRoute[] = [
         route: "/project/setting",
         controller: ProjectController,
         action: "setSetting",
-        needValid: true
+        needValid: true,
+        permissiion: OwnerPermission
     }
 ];
 
@@ -133,14 +140,16 @@ const CategoryRoute: IRoute[] = [
         route: "/category",
         controller: CategoryController,
         needValid: true,
-        action: "save"
+        action: "save",
+        permissiion: OwnerPermission
     },
     {
         method: "delete",
         route: "/category/:id",
         controller: CategoryController,
         needValid: true,
-        action: "remove"
+        action: "remove",
+        permissiion: OwnerPermission
     },
     {
         method: "get",
@@ -156,13 +165,14 @@ const TagRoute: IRoute[] = [
         route: "/tag",
         controller: TagController,
         action: "add",
-        needValid: true
+        needValid: true,
+        permissiion: OwnerPermission
     },
     {
         method: "get",
         route: "/tag",
         controller: TagController,
-        action: "all"
+        action: "all",
     },
     {
         method: "get",
@@ -175,13 +185,15 @@ const TagRoute: IRoute[] = [
         route: "/tag/:id",
         controller: TagController,
         needValid: true,
-        action: "remove"
+        action: "remove",
+        permissiion: OwnerPermission
     },
     {
         method: "put",
         route: "/tag/:id",
         controller: TagController,
-        action: "unLink"
+        action: "unLink",
+        permissiion: OwnerPermission
     }
 ];
 
@@ -206,6 +218,7 @@ export const uploadsRoutes: IUploadRoute[] = [
         controller: UploadsController,
         action: "poster",
         needValid: true,
+        permissiion: OwnerPermission,
         // fileds: uploadStorage.single("poster"),
         fileds: uploadMemoryStorage.single("poster"),
     }

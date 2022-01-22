@@ -40,16 +40,6 @@ export class Auth {
     // const headerToken = req.headers[this.tokenKey] as string;
     const remember = req.cookies["remember"] | 0;
     let token: string = cookieToken;
-    // if (cookieToken && !headerToken) {
-    //   token = cookieToken;
-    // } else if (!cookieToken && headerToken) {
-    //   token = headerToken;
-    // } else if (!cookieToken || cookieToken !== headerToken) {
-    //   // 如果cookie和header都没有token   或   不相等
-    //   return null;
-    // } else {
-    //   token = headerToken;
-    // }
 
     if (!token) return null;
 

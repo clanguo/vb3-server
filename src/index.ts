@@ -18,6 +18,8 @@ import errorMiddleware from "./middleware/errorMiddleware";
 import * as fs from "fs";
 import { putBuffer, putReadableStream } from "./tools/qiniuTool";
 import uploadMiddleware from "./middleware/uploadMiddleware";
+import { OwnerPermission } from "./constant/admin";
+import permissionMiddleware from "./middleware/permissionMiddleware";
 
 // 初始创建configManager对象
 const configManager = ConfigManager.getConfigManager();
@@ -81,6 +83,15 @@ createConnection().then(async connection => {
             Auth.auth(req, res, next);
         } else {
             next();
+        }
+    });
+
+    /**
+     * 操作权限处理中间件
+     */
+    Routes.forEach(route => {
+        if (route.permissiion && route.permissiion === OwnerPermission) {
+            return (app as any)[route.method](route.route, permissionMiddleware);
         }
     });
 
