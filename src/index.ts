@@ -71,7 +71,7 @@ createConnection().then(async connection => {
     app.use(log4js.connectLogger(routeLogger, {}));
 
     // 静态资源
-    app.use(express.static(path.resolve(__dirname, "../public")));
+    // app.use(express.static(path.resolve(__dirname, "../public")));
     // app.use("/", express.static(path.resolve(__dirname, "../public/dist")));
 
     // 注册鉴权路由
