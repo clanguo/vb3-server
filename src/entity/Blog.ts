@@ -1,9 +1,10 @@
 import { Type } from "class-transformer";
 import { IsNotEmpty, IsUrl, MaxLength } from "class-validator";
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, JoinColumn, JoinTable, ManyToMany, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import Base from "./Base";
 import { BlogContent } from "./BlogContent";
 import Category from "./Category";
+import Comment from "./Comment";
 import { Tag } from "./Tag";
 
 @Entity()
@@ -37,6 +38,10 @@ export class Blog extends Base {
 
   @ManyToOne((type) => Category, (category) => category.blogs)
   category: Category;
+
+  // @JoinColumn()
+  @OneToMany((type) => Comment, (comment) => comment.blog)
+  comments: Comment[];
 
   public static transform(obj: object): Blog {
     return super.baseTransform(this, obj);

@@ -1,4 +1,6 @@
+import { instanceToPlain } from "class-transformer";
 import { Response } from "express";
+import SearchCondition from "../entity/SearchCondition";
 
 type Data<T> = {
   err: null,
@@ -42,14 +44,25 @@ export function sendError(err) {
   };
 }
 
-export function sendPageData<T>(data: T[], count: number, limit: number, page: number, key: string): PageData<T[]> {
-  return {
-    data,
-    err: null,
-    count,
-    limit,
-    page,
-    key
+export function sendPageData<T>(data: T[], count: number, condition: SearchCondition): PageData<T[]>;
+export function sendPageData<T>(data: T[], count: number, limit: number, page: number, key: string): PageData<T[]>;
+export function sendPageData<T>(data: T[], count: number, arg1: SearchCondition | number, page?: number, key?: string): PageData<T[]> {
+  if (arg1 instanceof SearchCondition) {
+    return {
+      data,
+      err: null,
+      count,
+      ...(instanceToPlain(arg1) as SearchCondition)
+    }
+  } else {
+    return {
+      data,
+      err: null,
+      count,
+      limit: arg1,
+      page,
+      key
+    }
   }
 }
 

@@ -8,6 +8,7 @@ import * as multer from 'multer';
 import * as path from "path";
 import CategoryController from "./controller/CategoryController";
 import { AdminPermission, OwnerPermission } from "./constant/admin";
+import CommentController from "./controller/CommentController";
 
 export interface IRoute {
     method: "get" | "post" | "put" | "delete";
@@ -89,6 +90,12 @@ const AdminRoute: IRoute[] = [
         route: "/admin",
         controller: AdminController,
         action: "whoim",
+    },
+    {
+        method: "get",
+        route: "/authCode",
+        controller: AdminController,
+        action: "authCode"
     }
 ];
 
@@ -197,12 +204,36 @@ const TagRoute: IRoute[] = [
     }
 ];
 
+const CommentRoute: IRoute[] = [
+    {
+        method: "get",
+        route: "/comment/:id",
+        controller: CommentController,
+        action: "one",
+    },
+    {
+        method: "get",
+        route: "/comment",
+        controller: CommentController,
+        action: "all"
+    },
+    {
+        method: "post",
+        route: "/comment/:id",
+        controller: CommentController,
+        action: "save",
+        // needValid: true,
+        // permissiion: OwnerPermission
+    }
+];
+
 export const Routes = [
     ...BlogRoute,
     ...CategoryRoute,
     ...TagRoute,
     ...AdminRoute,
-    ...ProjectRoute
+    ...ProjectRoute,
+    ...CommentRoute
 ];
 
 Routes.map(route => {

@@ -4,8 +4,12 @@ import { Admin } from "../entity/Admin";
 import { Exception } from "../middleware/errorMiddleware";
 import { Auth } from "./Auth";
 import { ResponseResult, sendData, sendError } from "./Common";
+import axios from "axios";
 
 // interface IResponseAdmin extends Required<Exclude<Admin, "password">> { };
+
+const wxAppid = "wx78c4c8a73b3108c0";
+const wxAppSecrect = "a50ae6833f32faa85615cfaf133281dd";
 
 export class AdminController {
   private useAdmin = getRepository(Admin);
@@ -16,7 +20,8 @@ export class AdminController {
     const errors = await admin.validateThis();
     if (errors.length) {
       // return sendError(errors.join("; "));
-      return sendError("账号或密码错误");
+      console.log(errors, req.body);
+      return sendError("请正确输入账号或密码");
     }
 
     // 检查jwt
@@ -88,6 +93,16 @@ export class AdminController {
     } else {
       Auth.remove(res);
       return sendData(null);
+    }
+  }
+
+  async authCode(req: Request, res: Response, next: NextFunction): Promise<ResponseResult<string>> {
+    const code = req.query.code;
+    const result = await axios.get(`https://api.weixin.qq.com/sns/jscode2session?appid=${wxAppid}&secret=${wxAppSecrect}&js_code=${code}&grant_type=authorization_code`);
+    if (result.data.errcode !== undefined) {
+      return sendError(result.data.errmsg);
+    } else {
+      return sendData(result.data.openid);
     }
   }
 }

@@ -40,7 +40,7 @@ export class BlogController {
   }
 
   async one(request: Request, response: Response, next: NextFunction) {
-    const blog = await this.useBlog.findOne(request.params.id, { relations: ["content", "tags", "category"] });
+    const blog = await this.useBlog.findOne(request.params.id, { relations: ["content", "tags", "category", "comments"] });
     if (blog) {
       return sendData(blog);
     } else {
@@ -89,7 +89,6 @@ export class BlogController {
 
       await this.useBlog.remove(blogIns);
       await this.useContent.remove(blogIns.content);
-
 
       return sendData(true);
     } else {
