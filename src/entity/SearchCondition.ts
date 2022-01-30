@@ -6,7 +6,7 @@ export default class SearchCondition extends Base {
   @IsInt({ message: "limit必须是一个整数" })
   @IsPositive({ message: "limit必须是一个正数" })
   @Type(() => Number)
-  limit: number = 10;
+  limit: number = 100;
 
   @IsInt({ message: "page必须是一个整数" })
   @IsPositive({ message: "page必须是一个正数" })
