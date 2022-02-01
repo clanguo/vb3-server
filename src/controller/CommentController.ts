@@ -81,4 +81,25 @@ export default class CommentController {
     }
 
   }
+
+  public async allWithUserId(req: Request, res: Response, next: NextFunction): Promise<ResponseResult<Comment[]>> {
+    const userId = req.params.id;
+    if (!userId) {
+      return sendError("参数错误，请检查url是否正确");
+    }
+
+    const result = await this.useComment.find({
+      where: {
+        userId
+      },
+      relations: [
+        "blog"
+      ],
+      order: {
+        createdAt: "DESC"
+      }
+    });
+
+    return sendData(result);
+  }
 }

@@ -61,7 +61,7 @@ class ProjectController {
   }
 
   public async archive(req: Request, res: Response, next: NextFunction): Promise<ResponseResult<any>> {
-    const blogs = await this.useEventLog.find({ type: EventType.addBlog });
+    const blogs = await this.useEventLog.find({ where: { type: EventType.addBlog }, order: { createdAt: "DESC" } });
     return sendData(blogs);
   }
 

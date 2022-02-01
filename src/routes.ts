@@ -224,6 +224,12 @@ const CommentRoute: IRoute[] = [
         action: "save",
         // needValid: true,
         // permissiion: OwnerPermission
+    },
+    {
+        method: "get",
+        route: "/comment/user/:id",
+        controller: CommentController,
+        action: "allWithUserId"
     }
 ];
 
