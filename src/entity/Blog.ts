@@ -27,6 +27,10 @@ export class Blog extends Base {
   @Type(() => String)
   description: string = "";
 
+  @Column()
+  @Type(() => String)
+  qrCode: string = "";
+
   // @IsNotEmpty({message: "内容必须填写"})
   @JoinColumn()
   @OneToOne((type) => BlogContent, (content) => content.blog)

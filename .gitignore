@@ -7,3 +7,5 @@ public/dist
 public/log/*
 
 build
+
+build/*

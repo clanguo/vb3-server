@@ -4,12 +4,11 @@ import { Blog } from "../entity/Blog";
 import { ResponsePageData, ResponseResult, sendData, sendError, sendPageData, sendPageError } from "./Common";
 import { BlogContent } from "../entity/BlogContent";
 import { Tag } from "../entity/Tag";
-import EventLog, { EventType } from "../entity/EventLog";
+import { EventType } from "../entity/EventLog";
 import ProjectController from "./ProjectController";
 import SearchCondition from "../entity/SearchCondition";
-import { instanceToPlain } from "class-transformer";
 import ConfigManager from "../config/configManager";
-import { Exception } from "../middleware/errorMiddleware";
+import { getQRCode } from "../tools/wxTools";
 
 export class BlogController {
   private useBlog = getRepository(Blog);
@@ -51,7 +50,7 @@ export class BlogController {
   async save(request: Request, response: Response, next: NextFunction): Promise<ResponseResult<Blog>> {
     const contentObj = new BlogContent(request.body.content);
     const blog = Blog.transform(request.body);
-    
+
     blog.content = contentObj;
 
     const contentErrors = await contentObj.validateThis();
@@ -70,6 +69,11 @@ export class BlogController {
       const contentIns = await this.useContent.save(contentObj);
       blog.content = contentIns;
       const blogIns = await this.useBlog.save(blog);
+
+      const qrCode = await getQRCode(blogIns.id);
+      blogIns.qrCode = qrCode;
+
+      this.useBlog.save(blogIns);
 
       new ProjectController().addEventLog({
         timing: new Date(), target: blogIns.title, targetId: blogIns.id, type: EventType.addBlog
@@ -100,7 +104,7 @@ export class BlogController {
     ConfigManager.setConfig({
       lastUpdatedTime: Date.now()
     });
-    
+
     try {
       const id = request.params.id;
       const blog = await this.useBlog.findOne(id);
