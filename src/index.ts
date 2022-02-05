@@ -15,13 +15,9 @@ import corsMiddleware from "./middleware/corsMiddleware";
 import { routeLogger } from "./logger";
 import * as log4js from "log4js";
 import errorMiddleware from "./middleware/errorMiddleware";
-import * as fs from "fs";
-import { putBuffer, putReadableStream } from "./tools/qiniuTool";
 import uploadMiddleware from "./middleware/uploadMiddleware";
 import { OwnerPermission } from "./constant/admin";
 import permissionMiddleware from "./middleware/permissionMiddleware";
-import { task } from "./task";
-
 
 // 初始创建configManager对象
 const configManager = ConfigManager.getConfigManager();
@@ -117,7 +113,4 @@ createConnection().then(async connection => {
 
     console.log(`Express server has started on port ${PORT}. Open http://localhost:${PORT}/ to see results`);
 
-    
-
-    // task();
 }).catch(error => console.log(error));

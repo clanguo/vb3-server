@@ -14,7 +14,7 @@ export async function getQRCode(id: string): Promise<string> {
       responseType: "arraybuffer"
     });
     const randomCode = Math.random().toString(16).slice(2, 6);
-    return await putBuffer(`qr_${id}_${randomCode}.jpeg`, bufferRes.data);
+    return await putBuffer(`qr/qr_${id}_${randomCode}.jpeg`, bufferRes.data);
   } else {
     console.log(tokenRes.data);
     throw new Error("未知错误，请处理");
