@@ -24,7 +24,7 @@ const configManager = ConfigManager.getConfigManager();
 
 const PORT = 3001;
 
-
+configManager.setConfig({ startTime: +new Date() });
 
 const hanlderRoute = (route: IRoute) => {
     return (req: Request, res: Response, next: NextFunction) => {
