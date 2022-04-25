@@ -18,6 +18,9 @@ import errorMiddleware from "./middleware/errorMiddleware";
 import uploadMiddleware from "./middleware/uploadMiddleware";
 import { OwnerPermission } from "./constant/admin";
 import permissionMiddleware from "./middleware/permissionMiddleware";
+import * as cluster from "cluster";
+import * as process from "process";
+import { cpus } from "os";
 
 // 初始创建configManager对象
 const configManager = ConfigManager.getConfigManager();
@@ -53,64 +56,76 @@ const hanlderUploadRoute = (route: IUploadRoute) => {
     }
 }
 
-createConnection().then(async connection => {
-    // create express app
-    const app = express();
-    app.use(bodyParser.json());
+function startServer() {
+    createConnection().then(async connection => {
+        // create express app
+        const app = express();
+        app.use(bodyParser.json());
 
-    // cookie解析
-    app.use(cookieParser());
+        // cookie解析
+        app.use(cookieParser());
 
-    // 路由资源
-    // app.use(history());
+        // 路由资源
+        // app.use(history());
 
-    // cors中间件
-    app.use(corsMiddleware);
+        // cors中间件
+        app.use(corsMiddleware);
 
-    // logger
-    app.use(log4js.connectLogger(routeLogger, {}));
+        // logger
+        app.use(log4js.connectLogger(routeLogger, {}));
 
-    // 静态资源
-    // app.use(express.static(path.resolve(__dirname, "../public")));
-    // app.use("/", express.static(path.resolve(__dirname, "../public/dist")));
+        // 静态资源
+        // app.use(express.static(path.resolve(__dirname, "../public")));
+        // app.use("/", express.static(path.resolve(__dirname, "../public/dist")));
 
-    // 注册鉴权路由
-    app.use("/api", (req: Request, res: Response, next: NextFunction) => {
-        const matchRoute = Routes.find(route => route.method.toUpperCase() === req.method && !!match(route.route, { start: true, end: true })(req.path));
-        if (matchRoute && matchRoute.needValid) {
-            Auth.auth(req, res, next);
-        } else {
-            next();
-        }
-    });
+        // 注册鉴权路由
+        app.use("/api", (req: Request, res: Response, next: NextFunction) => {
+            const matchRoute = Routes.find(route => route.method.toUpperCase() === req.method && !!match(route.route, { start: true, end: true })(req.path));
+            if (matchRoute && matchRoute.needValid) {
+                Auth.auth(req, res, next);
+            } else {
+                next();
+            }
+        });
 
-    /**
-     * 操作权限处理中间件
-     */
-    Routes.forEach(route => {
-        if (route.permissiion && route.permissiion === OwnerPermission) {
-            return (app as any)[route.method](route.route, permissionMiddleware);
-        }
-    });
+        /**
+         * 操作权限处理中间件
+         */
+        Routes.forEach(route => {
+            if (route.permissiion && route.permissiion === OwnerPermission) {
+                return (app as any)[route.method](route.route, permissionMiddleware);
+            }
+        });
 
-    // register express routes from defined application routes
-    Routes.forEach(route => {
-        return (app as any)[route.method](route.route, hanlderRoute(route));
-    });
+        // register express routes from defined application routes
+        Routes.forEach(route => {
+            return (app as any)[route.method](route.route, hanlderRoute(route));
+        });
 
-    // 注册上传路由
-    uploadsRoutes.forEach(route => {
-        app.post(route.route, hanlderUploadRoute(route), uploadMiddleware);
-    });
+        // 注册上传路由
+        uploadsRoutes.forEach(route => {
+            app.post(route.route, hanlderUploadRoute(route), uploadMiddleware);
+        });
 
-    // setup express app here
-    // ...
+        // setup express app here
+        // ...
 
-    app.use(errorMiddleware);
+        app.use(errorMiddleware);
 
-    // start express server
-    app.listen(PORT);
+        // start express server
+        app.listen(PORT);
 
-    console.log(`Express server has started on port ${PORT}. Open http://localhost:${PORT}/ to see results`);
+        console.log(`Express server has started on port ${PORT}. Open http://localhost:${PORT}/ to see results`);
 
-}).catch(error => console.log(error));
+    }).catch(error => console.log(error));
+}
+
+if (cluster.isMaster) {
+    const cupLen = cpus().length;
+    for(let i = 0; i < cupLen; i++) {
+        cluster.fork();
+    }
+} else {
+    startServer();
+    console.log(`子进程${process.pid}已启动`);
+}
